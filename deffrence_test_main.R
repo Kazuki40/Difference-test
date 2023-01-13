@@ -17,7 +17,9 @@ use_data_anrysis <-
 
 # boxplot -----------------------------------------------------------------
 
+jpeg("boxplot.jpg")
 boxplot(value ~ kind, data = use_data_anrysis, main = "box_plot")
+dev.off()
 
 # group_num ---------------------------------------------------------------
 
@@ -39,11 +41,17 @@ basic <- parLapply(cl = cl, 1:id_label_leng, function(i) {
 stopCluster(cl)
 print(basic)
 
+
 lapply(1:id_label_leng, function(i) {
   temp <- use_data_anrysis[use_data_anrysis$kind == id_label[i], 2]
   #summary(temp)
+  file_name <- paste("histgram_", id_label[i], ".jpg")
+  jpeg(file_name)
   hist(temp, main = id_label[i])
+  
+  dev.off()
 })
+
 
 # Normality test (Shapiro-Wilk test) --------------------------------------
 #H0: ³‹K•ª•z‚Å‚ ‚éCH1:³‹K•ª•z‚Å‚Í‚È‚¢
@@ -64,6 +72,9 @@ if (normality_tf == FALSE) {
   print("no_normality")
 }
 
+if (id_label_leng == 1) {
+  stop("error")
+}
 
 # test --------------------------------------------------------------------
 
