@@ -1,6 +1,5 @@
 library(rstatix)
-library(parallel)
-library(lawstat)
+
 # read_csv ----------------------------------------------------------------
 file_name <- commandArgs(trailingOnly = TRUE)[1]
 if (is.na(file_name)) {
@@ -9,7 +8,7 @@ if (is.na(file_name)) {
 
 use_data_anrysis_func <- function(file) {
   data_read_csv <-
-    read.csv(file_name, header = TRUE, fileEncoding = "CP932")
+    read.csv(file_name, header = TRUE)
   
   return(data.frame(kind = factor(data_read_csv[, 1]), value = data_read_csv[, 2]))
 }
@@ -18,13 +17,14 @@ use_data_anrysis <- use_data_anrysis_func(file_name)
 
 # boxplot -----------------------------------------------------------------
 
-jpeg("boxplot.jpg")
+#("boxplot.jpg")
 boxplot(value ~ kind, data = use_data_anrysis, main = "box_plot")
-dev.off()
+#dev.off()
 
 # group_num ---------------------------------------------------------------
 
 id_label <- unique(use_data_anrysis$kind)
+
 id_label_leng <- length(id_label)
 if (id_label_leng == 1) {
   print("error 1")
@@ -32,26 +32,20 @@ if (id_label_leng == 1) {
 
 
 # basic_statistics --------------------------------------------------------
-cl <- makeCluster(detectCores())
-clusterExport(cl, c('id_label_leng', 'use_data_anrysis', 'id_label'))
-
-#parallelization
-basic <- parLapply(cl = cl, 1:id_label_leng, function(i) {
+basic <- lapply(1:id_label_leng, function(i) {
   temp <- use_data_anrysis[use_data_anrysis$kind == id_label[i], 2]
-  temp_list <- list(temp)
-  names(temp_list) <- id_label[i]
-  summary(temp_list)
+  summary(temp)
 })
-stopCluster(cl)
+names(basic) <- id_label
 print(basic)
 
 lapply(1:id_label_leng, function(i) {
   temp <- use_data_anrysis[use_data_anrysis$kind == id_label[i], 2]
   file_name <- paste("histgram_", id_label[i], ".jpg")
-  jpeg(file_name)
+  # jpeg(file_name)
   hist(temp, main = id_label[i])
   
-  dev.off()
+  #  dev.off()
 })
 
 
