@@ -1,4 +1,5 @@
 library(rstatix)
+library(lawstat)
 
 # read_csv ----------------------------------------------------------------
 file_name <- commandArgs(trailingOnly = TRUE)[1]
@@ -8,7 +9,7 @@ if (is.na(file_name)) {
 
 use_data_anrysis_func <- function(file) {
   data_read_csv <-
-    read.csv(file_name, header = TRUE)
+    read.csv(file_name, header = TRUE, fileEncoding = "cp932")
   
   return(data.frame(kind = factor(data_read_csv[, 1]), value = data_read_csv[, 2]))
 }
@@ -50,7 +51,7 @@ lapply(1:id_label_leng, function(i) {
 
 
 # Normality test (Shapiro-Wilk test) --------------------------------------
-#H0: ³‹K•ª•z‚Å‚ ‚éCH1:³‹K•ª•z‚Å‚Í‚È‚¢
+#H0: æ­£è¦åˆ†å¸ƒã§ã‚ã‚‹ï¼ŒH1:æ­£è¦åˆ†å¸ƒã§ã¯ãªã„
 shap_test <- lapply(1:id_label_leng, function(i) {
   temp <- use_data_anrysis[use_data_anrysis$kind == id_label[i], 2]
   shapiro.test(temp)
@@ -76,13 +77,13 @@ if (id_label_leng == 1) {
 
 # test --------------------------------------------------------------------
 
-#‘Î‰ž‚Ì‚È‚¢ŒŸ’è
+#å¯¾å¿œã®ãªã„æ¤œå®š
 if (id_label_leng == 2) {
-  #H0: 2ŒQ‚Ì•½‹Ï’l‚Í“™‚µ‚¢CH1: 2ŒQ‚Ì•½‹Ï’l‚ÍˆÙ‚È‚Á‚Ä‚¢‚é
+  #H0: 2ç¾¤ã®å¹³å‡å€¤ã¯ç­‰ã—ã„ï¼ŒH1: 2ç¾¤ã®å¹³å‡å€¤ã¯ç•°ãªã£ã¦ã„ã‚‹
   
   
-  #tŒŸ’è(welch‚ÌtŒŸ’è)
-  #“™•ªŽU‚ð‰¼’è‚µ‚È‚¢2ŒQŠÔ‚ÌŒŸ’è
+  #tæ¤œå®š(welchã®tæ¤œå®š)
+  #ç­‰åˆ†æ•£ã‚’ä»®å®šã—ãªã„2ç¾¤é–“ã®æ¤œå®š
   ans_t_test <-
     t_test(
       data = use_data_anrysis,
@@ -97,8 +98,8 @@ if (id_label_leng == 2) {
       detailed = TRUE
     )
   
-  #ƒEƒBƒ‹ƒRƒNƒ\ƒ“‚Ì‡ˆÊ˜aŒŸ’èi =ƒ}ƒ“ƒzƒBƒbƒgƒj[‚ÌUŒŸ’èj
-  #³‹K«‚ð‰¼’è‚µ‚È‚¢2ŒQŠÔ‚ÌŒŸ’è
+  #ã‚¦ã‚£ãƒ«ã‚³ã‚¯ã‚½ãƒ³ã®é †ä½å’Œæ¤œå®šï¼ˆ =ãƒžãƒ³ãƒ›ã‚£ãƒƒãƒˆãƒ‹ãƒ¼ã®Uæ¤œå®šï¼‰
+  #æ­£è¦æ€§ã‚’ä»®å®šã—ãªã„2ç¾¤é–“ã®æ¤œå®š
   ans_will_test <-
     wilcox_test(
       data = use_data_anrysis,
@@ -114,9 +115,9 @@ if (id_label_leng == 2) {
       detailed = TRUE
     )
   
-  #Brunner-Munzel‚ÌŒŸ’è
-  #³‹K«E“™•ªŽU‚ð‰¼’è‚µ‚È‚¢2ŒQŠÔ‚ÌŒŸ’è
-  #2ŒQ‚©‚ç‚»‚ê‚¼‚ê’l‚ðŽæ‚èo‚µ‚½ŽžCˆê•û‚ª‘½‚¢Šm—¦‚Í1/2
+  #Brunner-Munzelã®æ¤œå®š
+  #æ­£è¦æ€§ãƒ»ç­‰åˆ†æ•£ã‚’ä»®å®šã—ãªã„2ç¾¤é–“ã®æ¤œå®š
+  #2ç¾¤ã‹ã‚‰ãã‚Œãžã‚Œå€¤ã‚’å–ã‚Šå‡ºã—ãŸæ™‚ï¼Œä¸€æ–¹ãŒå¤šã„ç¢ºçŽ‡ã¯1/2
   ans_bru <- brunner.munzel.test(
     use_data_anrysis[use_data_anrysis$kind == id_label[1], 2],
     use_data_anrysis[use_data_anrysis$kind == id_label[2], 2],
@@ -124,7 +125,7 @@ if (id_label_leng == 2) {
     alpha = 0.05
   )
   
-  #o—Í
+  #å‡ºåŠ›
   print(ans_t_test)
   print(summary(ans_t_test))
   print(ans_will_test)
@@ -133,10 +134,10 @@ if (id_label_leng == 2) {
   print(summary(ans_bru))
   
 } else{
-  #H0: ‘S‚Ä‚ÌŒQ‚Ì•½‹Ï’l‚Í“™‚µ‚¢CH1: ‘S‚Ä‚ÌŒQ‚Ì‚¤‚¿‚¢‚¸‚ê‚©‚Ì•½‹Ï’l‚ÍˆÙ‚È‚Á‚Ä‚¢‚é
+  #H0: å…¨ã¦ã®ç¾¤ã®å¹³å‡å€¤ã¯ç­‰ã—ã„ï¼ŒH1: å…¨ã¦ã®ç¾¤ã®ã†ã¡ã„ãšã‚Œã‹ã®å¹³å‡å€¤ã¯ç•°ãªã£ã¦ã„ã‚‹
   
   
-  #‚PŒ³”z’u•ªŽU
+  #ï¼‘å…ƒé…ç½®åˆ†æ•£
   ans_aov <-
     aov(
       value ~ kind,
@@ -146,7 +147,7 @@ if (id_label_leng == 2) {
       contrasts = NULL
     )
   
-  #ƒNƒ‰ƒXƒJƒ‹EƒEƒH[ƒŠƒX‚ÌHŒŸ’è
+  #ã‚¯ãƒ©ã‚¹ã‚«ãƒ«ãƒ»ã‚¦ã‚©ãƒ¼ãƒªã‚¹ã®Hæ¤œå®š
   ans_kurask <- kruskal.test(value ~ kind, data = use_data_anrysis)
   
   print(ans_aov)
@@ -155,12 +156,12 @@ if (id_label_leng == 2) {
   print(summary(ans_kurask))
   
   
-  #‘½d”äŠrŒŸ’è
-  #•â³•û–@‚ÍHolm ‚Ì•û–@
-  #H0: ’Šo‚µ‚½2ŒQ‚Ì•½‹Ï’l‚Í“™‚µ‚¢CH1: ’Šo‚µ‚½2ŒQ‚Ì•½‹Ï’l‚ÍˆÙ‚È‚Á‚Ä‚¢‚é
+  #å¤šé‡æ¯”è¼ƒæ¤œå®š
+  #è£œæ­£æ–¹æ³•ã¯Holm ã®æ–¹æ³•
+  #H0: æŠ½å‡ºã—ãŸ2ç¾¤ã®å¹³å‡å€¤ã¯ç­‰ã—ã„ï¼ŒH1: æŠ½å‡ºã—ãŸ2ç¾¤ã®å¹³å‡å€¤ã¯ç•°ãªã£ã¦ã„ã‚‹
   
   
-  #‚”ŒŸ’è
+  #ï½”æ¤œå®š
   par_ans_t_test <-
     pairwise_t_test(
       data = use_data_anrysis,
@@ -171,7 +172,7 @@ if (id_label_leng == 2) {
       paired = FALSE,
       detailed = TRUE
     )
-  #ƒEƒBƒ‹ƒRƒNƒ\ƒ“‚ÌŒŸ’è(UŒŸ’è)
+  #ã‚¦ã‚£ãƒ«ã‚³ã‚¯ã‚½ãƒ³ã®æ¤œå®š(Uæ¤œå®š)
   par_ans_will_test <-
     pairwise_wilcox_test(
       data = use_data_anrysis,
@@ -181,8 +182,8 @@ if (id_label_leng == 2) {
       p.adjust.method = "holm",
       detailed = TRUE
     )
-  #o—Í
-  print("‘½d”äŠrŒŸ’è")
+  #å‡ºåŠ›
+  print("å¤šé‡æ¯”è¼ƒæ¤œå®š")
   print(par_ans_t_test)
   print(summary(par_ans_t_test))
   print(par_ans_will_test)
